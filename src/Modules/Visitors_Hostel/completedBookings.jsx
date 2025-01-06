@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types"; // Import PropTypes
 import { MantineProvider, Table, Text, Box } from "@mantine/core";
 import axios from "axios";
-import { host } from "../../routes/globalRoutes"; // Adjust the import as needed
+import { fetchCompletedBookingsRoute } from "../../routes/visitorsHostelRoutes";
 
 function BookingTable({ bookings }) {
   // Sort bookings by "check_in" date in ascending order
@@ -20,9 +20,20 @@ function BookingTable({ bookings }) {
           alignItems: "center",
         }}
       >
-        <Text size="xl" style={{ paddingBottom: 15, fontWeight: "bold" }}>
-          Completed Bookings
-        </Text>
+        <Box
+          style={{ display: "flex", justifyContent: "center", width: "100%" }}
+        >
+          <Text
+            style={{
+              paddingBottom: 15,
+              fontWeight: "bold",
+              fontSize: "24px",
+              color: "#228be6",
+            }}
+          >
+            Completed Bookings
+          </Text>
+        </Box>
       </Box>
       <Table
         style={{
@@ -51,8 +62,13 @@ function BookingTable({ bookings }) {
           </tr>
         </thead>
         <tbody>
-          {sortedBookings.map((booking) => (
-            <tr key={booking.id}>
+          {sortedBookings.map((booking, index) => (
+            <tr
+              key={booking.id}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#ffffff" : "#F5F7F8", // Alternating row colors
+              }}
+            >
               <td
                 style={{
                   padding: "12px",
@@ -134,12 +150,9 @@ function CompletedBookingsPage() {
       }
 
       try {
-        const { data } = await axios.get(
-          `${host}/visitorhostel/completed-bookings/`,
-          {
-            headers: { Authorization: `Token ${token}` },
-          },
-        );
+        const { data } = await axios.get(fetchCompletedBookingsRoute, {
+          headers: { Authorization: `Token ${token}` },
+        });
         setBookings(data.completed_bookings);
       } catch (error) {
         console.error("Error fetching completed bookings:", error);

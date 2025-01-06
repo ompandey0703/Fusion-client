@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types"; // Import PropTypes
 import { MantineProvider, Table, Badge, Text, Box } from "@mantine/core";
 import axios from "axios"; // Import axios for API calls
-import { host } from "../../routes/globalRoutes"; // Import the host URL
+import { fetchCancelledBookingsRoute } from "../../routes/visitorsHostelRoutes";
 
 function CancellationRequestTable({ bookings }) {
   // Sort bookings by "booking from" date in ascending order
@@ -20,10 +20,22 @@ function CancellationRequestTable({ bookings }) {
           alignItems: "center",
         }}
       >
-        <Text size="xl" style={{ paddingBottom: 15, fontWeight: "bold" }}>
-          Cancelled Requests
-        </Text>
+        <Box
+          style={{ display: "flex", justifyContent: "center", width: "100%" }}
+        >
+          <Text
+            style={{
+              paddingBottom: 15,
+              fontWeight: "bold",
+              fontSize: "24px",
+              color: "#228be6",
+            }}
+          >
+            Cancelled Requests
+          </Text>
+        </Box>
       </Box>
+
       <Table
         style={{
           borderRadius: "8px", // Border radius for table
@@ -51,8 +63,13 @@ function CancellationRequestTable({ bookings }) {
           </tr>
         </thead>
         <tbody>
-          {sortedBookings.map((booking) => (
-            <tr key={booking.id}>
+          {sortedBookings.map((booking, index) => (
+            <tr
+              key={booking.id}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#ffffff" : "#F5F7F8", // Alternating row colors
+              }}
+            >
               <td
                 style={{
                   padding: "12px",
@@ -147,12 +164,9 @@ function CancellationRequest() {
       }
 
       try {
-        const { data } = await axios.get(
-          `${host}/visitorhostel/get-inactive-bookings/`,
-          {
-            headers: { Authorization: `Token ${token}` },
-          },
-        );
+        const { data } = await axios.get(fetchCancelledBookingsRoute, {
+          headers: { Authorization: `Token ${token}` },
+        });
         setBookings(data.cancelled_bookings);
       } catch (error) {
         console.error("Error fetching cancelled bookings:", error);

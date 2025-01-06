@@ -11,11 +11,11 @@ import {
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { FaEye } from "react-icons/fa"; // Import the eye icon
-import { host } from "../../routes/globalRoutes";
 import CombinedBookingForm from "./bookingForm";
 import ForwardBookingForm from "./forwardBooking";
 import ConfirmBookingIn from "./confirmBooking_Incharge";
 import ViewBooking from "./viewBooking"; // Import the new ViewBooking component
+import { fetchBookingsRoute } from "../../routes/visitorsHostelRoutes";
 
 function BookingsRequestTable({ bookings, onBookingForward }) {
   const [modalOpened, setModalOpened] = useState(false); // State to control modal
@@ -72,18 +72,32 @@ function BookingsRequestTable({ bookings, onBookingForward }) {
         mb="md"
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: "center", // Centers the content horizontally
+          alignItems: "center", // Centers the content vertically
+          width: "100%", // Ensures the Box takes full width
+          gap: "1rem", // Adds space between the text and button
         }}
       >
-        <Text size="xl" style={{ paddingBottom: 15, fontWeight: "bold" }}>
-          Booking Requests
-        </Text>
+        <Box
+          style={{ display: "flex", justifyContent: "center", width: "80%" }}
+        >
+          <Text
+            style={{
+              paddingBottom: 15,
+              fontWeight: "bold",
+              fontSize: "24px",
+              color: "#228be6",
+            }}
+          >
+            Booking Requests
+          </Text>
+        </Box>
 
         <Button variant="outline" color="red" onClick={handleButtonClick}>
           Place Request
         </Button>
       </Box>
+
       {modalOpened && (
         <CombinedBookingForm
           modalOpened={modalOpened}
@@ -125,8 +139,13 @@ function BookingsRequestTable({ bookings, onBookingForward }) {
           </tr>
         </thead>
         <tbody>
-          {sortedBookings.map((booking) => (
-            <tr key={booking.id}>
+          {sortedBookings.map((booking, index) => (
+            <tr
+              key={booking.id}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#ffffff" : "#F5F7F8", // Alternating row colors
+              }}
+            >
               <td
                 style={{
                   padding: "12px",
@@ -309,12 +328,9 @@ function Bookings() {
     }
 
     try {
-      const { data } = await axios.get(
-        `${host}/visitorhostel/get-booking-requests/`,
-        {
-          headers: { Authorization: `Token ${token}` },
-        },
-      );
+      const { data } = await axios.get(fetchBookingsRoute, {
+        headers: { Authorization: `Token ${token}` },
+      });
       setBookings(data.pending_bookings);
     } catch (error) {
       console.error("Error fetching booking requests:", error);

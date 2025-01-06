@@ -10,7 +10,10 @@ import {
   Select,
 } from "@mantine/core";
 import axios from "axios";
-import { host } from "../../routes/globalRoutes";
+import {
+  cancelBookingRoute,
+  getActiveBookingsRoute,
+} from "../../routes/visitorsHostelRoutes";
 
 function BookingTable({ activeBooking, onCancel }) {
   const [searchTerm, setSearchTerm] = useState(""); // State to store the search term
@@ -42,15 +45,22 @@ function BookingTable({ activeBooking, onCancel }) {
           alignItems: "center",
         }}
       >
-        <Text size="xl" style={{ paddingBottom: 15, fontWeight: "bold" }}>
-          Active Bookings
-        </Text>
         <TextInput
           placeholder="Search by Intender, Booking From, Booking To "
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.currentTarget.value)}
-          style={{ width: "300px", marginRight: "10px" }}
+          style={{ width: "250px", marginRight: "0px" }}
         />
+        <Text
+          style={{
+            paddingBottom: 10,
+            fontWeight: "bold",
+            fontSize: "24px",
+            color: "#228be6",
+          }}
+        >
+          Active Bookings
+        </Text>
         <Select
           placeholder="Sort by"
           data={[
@@ -60,7 +70,7 @@ function BookingTable({ activeBooking, onCancel }) {
           ]}
           value={sortField}
           onChange={(value) => setSortField(value)}
-          style={{ width: "150px" }}
+          style={{ width: "180px" }}
         />
       </Box>
       <Table
@@ -90,8 +100,13 @@ function BookingTable({ activeBooking, onCancel }) {
           </tr>
         </thead>
         <tbody>
-          {sortedBookings.map((booking) => (
-            <tr key={booking.id}>
+          {sortedBookings.map((booking, index) => (
+            <tr
+              key={booking.id}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#ffffff" : "#F5F7F8", // Alternating row colors
+              }}
+            >
               <td
                 style={{
                   padding: "12px",
@@ -179,12 +194,9 @@ function ActiveBookingsPage() {
     }
 
     try {
-      const { data } = await axios.get(
-        `${host}/visitorhostel/get-active-bookings/`,
-        {
-          headers: { Authorization: `Token ${token}` },
-        },
-      );
+      const { data } = await axios.get(getActiveBookingsRoute, {
+        headers: { Authorization: `Token ${token}` },
+      });
       setBookings(data.active_bookings);
     } catch (error) {
       console.error("Error fetching active bookings:", error);
@@ -208,7 +220,7 @@ function ActiveBookingsPage() {
         charges: 0,
       };
 
-      await axios.post(`${host}/visitorhostel/cancel-booking/`, data, {
+      await axios.post(cancelBookingRoute, data, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "application/x-www-form-urlencoded",
